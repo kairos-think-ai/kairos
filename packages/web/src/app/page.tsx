@@ -13,6 +13,19 @@ export default function LandingPage() {
   useEffect(() => {
     async function checkAuth() {
       const supabase = createBrowserSupabaseClient();
+
+      // Handle OAuth PKCE code — Supabase redirects here with ?code=
+      // when the Site URL is the landing page
+      const params = new URLSearchParams(window.location.search);
+      const code = params.get('code');
+      if (code) {
+        const { error } = await supabase.auth.exchangeCodeForSession(code);
+        if (!error) {
+          window.location.href = '/dashboard';
+          return;
+        }
+      }
+
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         window.location.href = '/dashboard';

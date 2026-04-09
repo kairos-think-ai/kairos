@@ -1,58 +1,34 @@
-'use client';
+import { redirect } from 'next/navigation';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
+import DashboardClient from './DashboardClient';
 
-import { useState, useEffect } from 'react';
-import dynamic from 'next/dynamic';
-import { createBrowserSupabaseClient } from '@/lib/supabase/client';
-import Sidebar, { type View } from '@/components/Sidebar';
+/**
+ * Dashboard Page (Server Component)
+ *
+ * Checks auth server-side where cookies are immediately available
+ * (no client-side race condition). If authenticated, renders the
+ * client dashboard. If not, redirects to login.
+ */
+export default async function DashboardPage() {
+  const cookieStore = await cookies();
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll();
+        },
+      },
+    },
+  );
 
-const HomeView = dynamic(() => import('@/components/views/HomeView'), { ssr: false });
-const ExploreView = dynamic(() => import('@/components/views/ExploreView'), { ssr: false });
-const TrendsView = dynamic(() => import('@/components/views/TrendsView'), { ssr: false });
-const ProjectsView = dynamic(() => import('@/components/views/ProjectsView'), { ssr: false });
+  const { data: { user }, error } = await supabase.auth.getUser();
 
-export default function DashboardPage() {
-  const [activeView, setActiveView] = useState<View>('home');
-  const [authenticated, setAuthenticated] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    async function checkAuth() {
-      const supabase = createBrowserSupabaseClient();
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        window.location.href = '/login';
-        return;
-      }
-      setAuthenticated(true);
-    }
-    checkAuth();
-  }, []);
-
-  if (authenticated === null) {
-    return (
-      <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        height: '100vh', background: 'var(--bg-primary)', color: 'var(--text-muted)',
-      }}>
-        Loading...
-      </div>
-    );
+  if (error || !user) {
+    redirect('/login');
   }
 
-  if (!authenticated) return null;
-
-  return (
-    <div className="dashboard-layout">
-      <Sidebar
-        activeView={activeView}
-        onViewChange={setActiveView}
-        activePage="dashboard"
-      />
-      <main className="main-content">
-        {activeView === 'home' && <HomeView />}
-        {activeView === 'explore' && <ExploreView />}
-        {activeView === 'trends' && <TrendsView />}
-        {activeView === 'projects' && <ProjectsView />}
-      </main>
-    </div>
-  );
+  return <DashboardClient />;
 }

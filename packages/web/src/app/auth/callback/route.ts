@@ -37,8 +37,13 @@ export async function GET(request: NextRequest) {
       // Check if user has completed onboarding
       const { data: { user } } = await supabase.auth.getUser();
       const onboardingComplete = user?.user_metadata?.onboarding_complete;
-      if (!onboardingComplete) {
-        return NextResponse.redirect(`${origin}/onboarding`);
+      if (!onboardingComplete && next === '/') {
+        // Only redirect to onboarding for fresh signups, not returning users
+        // Check if user has any conversations — if yes, they're returning
+        const { count } = await supabase.from('conversations').select('id', { count: 'exact', head: true });
+        if (count === 0) {
+          return NextResponse.redirect(`${origin}/onboarding`);
+        }
       }
       const destination = next === '/' ? '/dashboard' : next;
       // If next is already a full URL (e.g., from OAuth consent redirect), use it directly

@@ -70,7 +70,7 @@ export default function OAuthConsentPage() {
     setApproving(true);
     try {
       const supabase = createBrowserSupabaseClient();
-      const { error: approveError } = await (supabase.auth as any).oauth.approveAuthorization(authDetails.authorizationId);
+      const { data, error: approveError } = await (supabase.auth as any).oauth.approveAuthorization(authDetails.authorizationId);
 
       if (approveError) {
         setError(approveError.message || 'Failed to approve');
@@ -78,7 +78,10 @@ export default function OAuthConsentPage() {
         return;
       }
 
-      // Supabase handles the redirect back to the client
+      // Redirect to the client's callback (e.g., Claude Code's localhost server)
+      if (data?.redirect_to) {
+        window.location.href = data.redirect_to;
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to approve authorization');
       setApproving(false);
@@ -88,8 +91,11 @@ export default function OAuthConsentPage() {
   const handleDeny = async () => {
     try {
       const supabase = createBrowserSupabaseClient();
-      await (supabase.auth as any).oauth.denyAuthorization(authDetails.authorizationId);
-      // Supabase handles the redirect with error
+      const { data } = await (supabase.auth as any).oauth.denyAuthorization(authDetails.authorizationId);
+      if (data?.redirect_to) {
+        window.location.href = data.redirect_to;
+        return;
+      }
     } catch {
       window.location.href = '/dashboard';
     }
