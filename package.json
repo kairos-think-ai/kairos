@@ -1,0 +1,27 @@
+{
+  "name": "kairos",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Kairos — the attention agent that makes your thinking visible",
+  "workspaces": [
+    "packages/core",
+    "packages/web",
+    "packages/extension",
+    "packages/mcp"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=packages/web",
+    "dev:ext": "npm run dev --workspace=packages/extension",
+    "build": "npm run build --workspace=packages/web && npm run build --workspace=packages/extension",
+    "build:web": "npm run build --workspace=packages/web",
+    "build:ext": "npm run build --workspace=packages/extension",
+    "lint": "npm run lint --workspace=packages/web"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "autoprefixer": "^10.4.20",
+    "tailwindcss": "^3.4.13"
+  }
+}

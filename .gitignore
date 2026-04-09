@@ -1,0 +1,40 @@
+node_modules/
+.next/
+out/
+dist/
+.env
+.env.local
+.env.*.local
+*.log
+.vercel
+.DS_Store
+Thumbs.db
+.claude/
+supabase/.temp/
+*.timestamp-*
+tsconfig.tsbuildinfo
+
+# External dependencies (vendored, not our code)
+.gstack/
+
+# User data (not tracked in git)
+data-*/
+
+# ALL internal documents (private, never commit)
+*.md
+!README.md
+!packages/**/README.md
+!packages/plugin/skills/**/*.md
+docs/
+
+# Screenshots
+Screenshot/
+Screenshot\ *
+*.png
+*.docx
+
+# Old/backup files
+packages/web/src/app/page.old.tsx
+
+# Test scripts (development only)
+packages/mcp/test-*.mjs

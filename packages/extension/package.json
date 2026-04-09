@@ -1,0 +1,18 @@
+{
+  "name": "@kairos/extension",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Kairos browser extension — Node #1 for conversation sensing",
+  "scripts": {
+    "dev": "vite build --watch",
+    "build": "vite build",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.270",
+    "typescript": "^5.4.0",
+    "vite": "^5.4.0",
+    "vite-plugin-web-extension": "^4.0.0"
+  }
+}

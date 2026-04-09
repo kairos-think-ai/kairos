@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "kairos": {
+      "command": "npx",
+      "args": ["-y", "@kairos/mcp"],
+      "env": {
+        "SUPABASE_URL": "${KAIROS_SUPABASE_URL}",
+        "SUPABASE_SERVICE_ROLE_KEY": "${KAIROS_SUPABASE_KEY}",
+        "KAIROS_USER_ID": "${KAIROS_USER_ID}"
+      }
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "name": "kairos",
+  "version": "0.1.0",
+  "description": "Your thinking patterns coach. Analyzes engagement, drift, and ideas across AI conversations. Provides real-time coaching to help you think better with AI.",
+  "author": {
+    "name": "Kairos",
+    "url": "https://github.com/revathiprasad/kairos"
+  },
+  "hooks": "./hooks/hooks.json",
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json"
+}

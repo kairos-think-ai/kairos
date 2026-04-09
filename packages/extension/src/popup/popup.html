@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kairos</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      width: 320px;
+      font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0a0a0b;
+      color: #e4e4e7;
+      padding: 20px;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logo-mark {
+      width: 24px;
+      height: 24px;
+      background: linear-gradient(135deg, #818cf8 0%, #6366f1 100%);
+      border-radius: 6px;
+    }
+
+    .logo-text {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: #fafafa;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #22c55e;
+    }
+
+    .status-dot.paused {
+      background: #f59e0b;
+    }
+
+    .status-dot.disconnected {
+      background: #ef4444;
+    }
+
+    /* ---- Briefing Section (The Agent's Voice) ---- */
+    .briefing {
+      margin-bottom: 14px;
+    }
+
+    .briefing-header {
+      font-size: 12px;
+      font-weight: 600;
+      color: #a1a1aa;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .briefing-header-icon {
+      font-size: 14px;
+    }
+
+    .briefing-card {
+      background: #18181b;
+      border: 1px solid #27272a;
+      border-left: 3px solid #6366f1;
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+    }
+
+    .briefing-card.lesson {
+      border-left-color: #22c55e;
+    }
+
+    .briefing-card.cluster {
+      border-left-color: #f59e0b;
+    }
+
+    .briefing-card.coaching {
+      border-left-color: #818cf8;
+    }
+
+    .briefing-card-icon {
+      font-size: 12px;
+      margin-right: 4px;
+    }
+
+    .briefing-card-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: #a1a1aa;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 4px;
+    }
+
+    .briefing-card-text {
+      font-size: 12px;
+      color: #e4e4e7;
+      line-height: 1.4;
+    }
+
+    .briefing-card-meta {
+      font-size: 10px;
+      color: #71717a;
+      margin-top: 4px;
+    }
+
+    .briefing-empty {
+      font-size: 12px;
+      color: #52525b;
+      text-align: center;
+      padding: 12px 0;
+      line-height: 1.5;
+    }
+
+    .briefing-loading {
+      font-size: 12px;
+      color: #52525b;
+      text-align: center;
+      padding: 12px 0;
+    }
+
+    /* ---- Compact Stats Footer ---- */
+    .stat-card {
+      background: #18181b;
+      border: 1px solid #27272a;
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #71717a;
+      margin-bottom: 4px;
+    }
+
+    .stat-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: #fafafa;
+      letter-spacing: -0.03em;
+    }
+
+    .stat-row {
+      display: flex;
+      gap: 12px;
+    }
+
+    .stat-row .stat-card {
+      flex: 1;
+    }
+
+    .compact-stats {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .compact-stat {
+      flex: 1;
+      background: #18181b;
+      border: 1px solid #27272a;
+      border-radius: 8px;
+      padding: 8px 10px;
+      text-align: center;
+    }
+
+    .compact-stat-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #71717a;
+      margin-bottom: 2px;
+    }
+
+    .compact-stat-value {
+      font-size: 18px;
+      font-weight: 700;
+      color: #fafafa;
+      letter-spacing: -0.02em;
+    }
+
+    /* Privacy tier card */
+    .tier-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: default;
+    }
+
+    .tier-icon {
+      font-size: 18px;
+      line-height: 1;
+    }
+
+    .tier-info {
+      flex: 1;
+    }
+
+    .tier-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #fafafa;
+    }
+
+    .tier-desc {
+      font-size: 11px;
+      color: #71717a;
+      margin-top: 2px;
+    }
+
+    .tier-card.mirror {
+      border-color: #22c55e33;
+    }
+
+    .tier-card.analyst {
+      border-color: #818cf833;
+    }
+
+    .platforms {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .platform-badge {
+      font-size: 10px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: #27272a;
+      color: #a1a1aa;
+    }
+
+    .platform-badge.active {
+      background: rgba(99, 102, 241, 0.15);
+      color: #818cf8;
+    }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-top: 1px solid #27272a;
+      margin-top: 6px;
+    }
+
+    .toggle-label {
+      font-size: 13px;
+      color: #a1a1aa;
+    }
+
+    .toggle {
+      position: relative;
+      width: 40px;
+      height: 22px;
+      cursor: pointer;
+    }
+
+    .toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-track {
+      position: absolute;
+      inset: 0;
+      background: #27272a;
+      border-radius: 11px;
+      transition: background 0.2s;
+    }
+
+    .toggle input:checked + .toggle-track {
+      background: #6366f1;
+    }
+
+    .toggle-thumb {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 18px;
+      height: 18px;
+      background: #fafafa;
+      border-radius: 50%;
+      transition: transform 0.2s;
+    }
+
+    .toggle input:checked ~ .toggle-thumb {
+      transform: translateX(18px);
+    }
+
+    .dashboard-link {
+      display: block;
+      text-align: center;
+      padding: 10px;
+      margin-top: 10px;
+      background: #6366f1;
+      color: #fafafa;
+      text-decoration: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      transition: background 0.2s;
+    }
+
+    .dashboard-link:hover {
+      background: #4f46e5;
+    }
+
+    .auth-prompt {
+      text-align: center;
+      padding: 24px 0;
+    }
+
+    .auth-prompt p {
+      font-size: 13px;
+      color: #71717a;
+      margin-bottom: 12px;
+    }
+
+    .sign-in-btn {
+      display: inline-block;
+      padding: 10px 24px;
+      background: #6366f1;
+      color: #fafafa;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    /* Tier selection screen */
+    .tier-select {
+      text-align: center;
+      padding: 8px 0;
+    }
+
+    .tier-select h3 {
+      font-size: 15px;
+      font-weight: 600;
+      color: #fafafa;
+      margin-bottom: 6px;
+    }
+
+    .tier-select p {
+      font-size: 12px;
+      color: #71717a;
+      margin-bottom: 16px;
+      line-height: 1.4;
+    }
+
+    .tier-btn {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      margin-bottom: 10px;
+      background: #18181b;
+      border: 1px solid #27272a;
+      border-radius: 10px;
+      cursor: pointer;
+      text-align: left;
+      transition: border-color 0.2s;
+    }
+
+    .tier-btn:hover {
+      border-color: #6366f1;
+    }
+
+    .tier-btn-icon {
+      font-size: 20px;
+      margin-bottom: 6px;
+    }
+
+    .tier-btn-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #fafafa;
+      margin-bottom: 4px;
+    }
+
+    .tier-btn-desc {
+      font-size: 11px;
+      color: #a1a1aa;
+      line-height: 1.4;
+    }
+
+    .tier-btn.mirror-btn:hover {
+      border-color: #22c55e;
+    }
+
+    .tier-btn.analyst-btn:hover {
+      border-color: #818cf8;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">
+      <div class="logo-mark"></div>
+      <span class="logo-text">Kairos</span>
+    </div>
+    <div class="status-dot" id="statusDot"></div>
+  </div>
+
+  <!-- Tier Selection (first run — no tier chosen yet) -->
+  <div id="tierSelectView" style="display: none;">
+    <div class="tier-select">
+      <h3>Choose your privacy level</h3>
+      <p>You can change this anytime in settings.</p>
+
+      <button class="tier-btn mirror-btn" id="chooseMirror">
+        <div class="tier-btn-icon">🛡️</div>
+        <div class="tier-btn-name">The Mirror</div>
+        <div class="tier-btn-desc">Local only. Zero data leaves your device. Behavioral patterns computed on-device.</div>
+      </button>
+
+      <button class="tier-btn analyst-btn" id="chooseAnalyst">
+        <div class="tier-btn-icon">🔬</div>
+        <div class="tier-btn-name">The Analyst</div>
+        <div class="tier-btn-desc">AI-powered analysis. Data syncs to cloud for idea extraction, drift reports, and coaching.</div>
+      </button>
+    </div>
+  </div>
+
+  <!-- Authenticated main view -->
+  <div id="mainView" style="display: none;">
+    <!-- Briefing Section — The Agent's Voice -->
+    <div class="briefing" id="briefingSection">
+      <div class="briefing-header">
+        <span class="briefing-header-icon">&#x1F4A1;</span>
+        <span>Before you start...</span>
+      </div>
+      <div id="briefingContent">
+        <div class="briefing-loading">Loading insights...</div>
+      </div>
+    </div>
+
+    <!-- Compact Stats Row -->
+    <div class="compact-stats">
+      <div class="compact-stat">
+        <div class="compact-stat-label">Today</div>
+        <div class="compact-stat-value" id="dailyCount">0</div>
+      </div>
+      <div class="compact-stat">
+        <div class="compact-stat-label" id="secondStatLabel">Local</div>
+        <div class="compact-stat-value" id="secondStatValue">0</div>
+      </div>
+      <div class="compact-stat" id="tierBadge">
+        <div class="compact-stat-label">Mode</div>
+        <div class="compact-stat-value" id="tierBadgeValue" style="font-size: 12px; font-weight: 600;">&#x1F6E1;&#xFE0F;</div>
+      </div>
+    </div>
+
+    <div class="toggle-row">
+      <span class="toggle-label">Capture conversations</span>
+      <label class="toggle">
+        <input type="checkbox" id="captureToggle" checked>
+        <span class="toggle-track"></span>
+        <span class="toggle-thumb"></span>
+      </label>
+    </div>
+
+    <a href="#" id="dashboardLink" class="dashboard-link" target="_blank">
+      Open Dashboard &rarr;
+    </a>
+  </div>
+
+  <!-- Unauthenticated view -->
+  <div id="authView" style="display: none;">
+    <div class="auth-prompt">
+      <p>Sign in to start capturing your AI conversations and see your attention patterns.</p>
+      <button class="sign-in-btn" id="signInBtn">Sign in with Google</button>
+    </div>
+  </div>
+
+  <script type="module" src="popup.js"></script>
+</body>
+</html>
