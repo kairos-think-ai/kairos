@@ -147,4 +147,4 @@ Issues and pull requests welcome. The engine (`packages/core`) is where the meth
 
 ## License
 
-Apache 2.0
+MIT
