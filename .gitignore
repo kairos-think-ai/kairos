@@ -35,6 +35,7 @@ Screenshot\ *
 
 # Old/backup files
 packages/web/src/app/page.old.tsx
+*.bak
 
 # Test scripts (development only)
 packages/mcp/test-*.mjs

@@ -14,14 +14,14 @@
 
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const OPENAI_KEY = process.env.OPENAI_API_KEY;
+const VOYAGE_KEY = process.env.VOYAGE_API_KEY;
 
 if (!SUPABASE_URL || !SUPABASE_KEY) {
   console.error('Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY');
   process.exit(1);
 }
-if (!OPENAI_KEY) {
-  console.error('Missing OPENAI_API_KEY');
+if (!VOYAGE_KEY) {
+  console.error('Missing VOYAGE_API_KEY');
   process.exit(1);
 }
 
@@ -50,19 +50,19 @@ async function getDefaultUserId() {
 const USER_ID = process.env.KAIROS_USER_ID || await getDefaultUserId();
 
 async function callEmbeddingAPI(texts) {
-  const res = await fetch('https://api.openai.com/v1/embeddings', {
+  const res = await fetch('https://api.voyageai.com/v1/embeddings', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${OPENAI_KEY}`,
+      Authorization: `Bearer ${VOYAGE_KEY}`,
     },
     body: JSON.stringify({
-      model: 'text-embedding-3-small',
+      model: 'voyage-3',
       input: texts,
-      dimensions: 1024, // OpenAI supports custom dimensions — match our schema
+      input_type: 'document',
     }),
   });
-  if (!res.ok) throw new Error(`OpenAI ${res.status}: ${await res.text()}`);
+  if (!res.ok) throw new Error(`Voyage ${res.status}: ${await res.text()}`);
   const data = await res.json();
   return data.data.sort((a, b) => a.index - b.index).map((d) => d.embedding);
 }
@@ -150,7 +150,7 @@ for (let ci = 0; ci < conversations.length; ci++) {
   }
 }
 
-const estimatedCost = (totalTokensEstimate / 1_000_000) * 0.02; // OpenAI text-embedding-3-small: $0.02/M tokens
+const estimatedCost = (totalTokensEstimate / 1_000_000) * 0.06; // Voyage voyage-3: $0.06/M tokens
 console.log(`\n=== Done ===`);
 console.log(`Embedded: ${totalEmbedded} messages`);
 console.log(`Skipped: ${totalSkipped} (already had embeddings)`);
