@@ -51,8 +51,9 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 ```
 
-2. Enable **Google OAuth** in Authentication > Providers > Google
-3. Copy your project URL, anon key, and service role key from Settings > API
+2. Enable **Google OAuth** in Authentication > Providers > Google. You'll need a Google Cloud OAuth client — create one at [console.cloud.google.com](https://console.cloud.google.com/apis/credentials), set the authorized redirect URI to `https://<your-project>.supabase.co/auth/v1/callback`, then paste the Client ID and Secret into Supabase.
+3. Add your app's URL to Supabase **Authentication > URL Configuration > Site URL** (e.g. `http://localhost:3000` for dev, your Vercel URL for prod) and add the same URL plus `/auth/callback` to **Redirect URLs**.
+4. Copy your project URL, anon key, and service role key from Settings > API.
 
 ### 3. Configure environment
 
@@ -60,7 +61,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 cp packages/web/.env.example packages/web/.env.local
 ```
 
-Fill in your Supabase credentials, Anthropic API key, and OpenAI API key.
+Fill in your Supabase credentials, Anthropic API key, and Voyage AI API key.
 
 ### 4. Run
 
@@ -79,6 +80,29 @@ vercel --prod
 ```
 
 Set the root directory to `packages/web` and add your environment variables in the Vercel dashboard.
+
+### 6. Load the Chrome extension (optional, for real-time capture)
+
+The browser extension captures Claude.ai / ChatGPT / Gemini conversations as they happen and shows live coaching nudges. It's optional — you can also use the dashboard import flow without it.
+
+1. Build the extension:
+   ```bash
+   npx esbuild packages/extension/src/background/service-worker.ts \
+     --bundle --format=esm --target=chrome120 \
+     --outfile=packages/extension/dist/src/background/service-worker.js
+   ```
+   (Content scripts for MAIN and ISOLATED worlds need separate builds — see `packages/extension/README.md`.)
+
+2. Open `chrome://extensions`, enable **Developer mode**, and click **Load unpacked**. Select `packages/extension/dist/`.
+
+3. Chrome assigns your install a unique extension ID. Copy it from the extensions page.
+
+4. Tell the dashboard about it. The current code hardcodes a development extension ID in three places:
+   - `packages/web/src/app/import/page.tsx`
+   - `packages/web/src/app/onboarding/page.tsx`
+   - `packages/web/src/app/page.tsx`
+
+   Search for `KAIROS_EXTENSION_ID` and replace the value with your own ID. (We're moving this to an env var — see issue tracker.)
 
 ## Connect to Claude
 
@@ -135,7 +159,7 @@ Pure computation, no database dependencies. The methodology:
 You bring:
 - A [Supabase](https://supabase.com) project (database + auth)
 - An [Anthropic](https://console.anthropic.com) API key (for conversation analysis)
-- An [OpenAI](https://platform.openai.com) API key (for message embeddings)
+- A [Voyage AI](https://www.voyageai.com) API key (for message embeddings)
 - Google OAuth credentials (configured in Supabase)
 - A hosting platform (Vercel, Railway, or any Node.js host)
 
@@ -147,4 +171,4 @@ Issues and pull requests welcome. The engine (`packages/core`) is where the meth
 
 ## License
 
-MIT
+Apache 2.0 — see [LICENSE](LICENSE).
